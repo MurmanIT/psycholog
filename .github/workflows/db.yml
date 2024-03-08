@@ -1,5 +1,5 @@
 # This is a basic workflow to help you get started with Actions
-name: CIDB
+name: CI_DB
 permissions:
   contents: write
   packages: write
@@ -27,17 +27,6 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  push_to_registry:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion != 'failure' }}
-    steps:
-      - name: checkout
-        if: ${{ github.event.inputs.version == '' || github.event.inputs.version == 'latest' }}
-        uses: actions/checkout@v3
-      # Assign environment variables used in subsequent steps
-      - name: Env variable assignment
-        run: echo "image_repository_name=${{ github.event.inputs.image_repository_name }}" >> $GITHUB_ENV
-    # This workflow contains a single job called "build"
   build:
     needs: push_to_registry
     if: ${{ github.event.workflow_run.conclusion != 'failure' }}
@@ -49,10 +38,30 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       - name: Build docker compose
-        run: docker compose -f docker-compose.db.yml up -d --build
-  deploy_via_ssh:
+        run: docker compose -f docker-compose.db.yml build --no-cache --force-rm
+  test:
     needs: build
-    if: ${{ github.event.workflow_run.conclusion !== 'failure' }}
+    if: ${{ github.event.workflow_run.conclusion != 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test
+        run: docker compose -f docker-compose.db.yml up
+  push_to_registry:
+    needs: test
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion != 'failure' }}
+    steps:
+      - name: checkout
+        if: ${{ github.event.inputs.version == '' || github.event.inputs.version == 'latest' }}
+        uses: actions/checkout@v3
+      # Assign environment variables used in subsequent steps
+      - name: Env variable assignment
+        run: echo "image_repository_name=${{ github.event.inputs.image_repository_name }}" >> $GITHUB_ENV
+    # This workflow contains a single job called "build"
+  deploy_via_ssh:
+    needs: push_to_registry
+    if: ${{ github.event.workflow_run.conclusion != 'failure' }}
     runs-on: ubuntu-latest
     steps:
       - name: Create .env file
