@@ -3,6 +3,15 @@ name: CI_DB
 
 # Controls when the workflow will run
 on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      environment:
+        description: 'Environment'
+        required: true
   # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
     branches: [ "db" ]
@@ -43,12 +52,12 @@ jobs:
           source: docker-compose.db.yml
           target: deploy/docker-compose.db.yml
 
-      - name: Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ vars.DEPLOY_HOST }}
-          username: ${{ vars.DEPLOY_USERNAME }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          port: ${{ vars.DEPLOY_PORT }}
-          script: |
-            docker compose -f docker-compose.db.yml up -d
+      # - name: Deploy
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ vars.DEPLOY_HOST }}
+      #     username: ${{ vars.DEPLOY_USERNAME }}
+      #     key: ${{ secrets.DEPLOY_KEY }}
+      #     port: ${{ vars.DEPLOY_PORT }}
+      #     script: |
+      #       docker compose -f docker-compose.db.yml up -d
