@@ -39,19 +39,8 @@ jobs:
           username: ${{ vars.DEPLOY_USERNAME }}
           key: ${{ secrets.DEPLOY_KEY }}
           port: ${{ vars.DEPLOY_PORT }}
-          source: .env
-          target: deploy/.env
-
-      - name: Copy files to target server via scp
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ vars.DEPLOY_HOST }}
-          username: ${{ vars.DEPLOY_USERNAME }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          port: ${{ vars.DEPLOY_PORT }}
-          source: docker-compose.db.yml
-          target: deploy/docker-compose.db.yml
-
+          source: "./../../docker-compose.db.yml, ./.env"
+          target: "~/.deploy/${{ github.event.repository.name }}/"
       # - name: Deploy
       #   uses: appleboy/ssh-action@master
       #   with:
