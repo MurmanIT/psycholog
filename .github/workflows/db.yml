@@ -37,7 +37,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       - name: Build docker compose
-        run: POSTGRES_PASSWORD=${{ secrets.db.POSTGRES_PASSWORD }} docker compose -f docker-compose.db.yml build --no-cache --force-rm
+        run: POSTGRES_PASSWORD=api docker compose -f docker-compose.db.yml build --no-cache --force-rm
   test:
     needs: build
     if: ${{ github.event.workflow_run.conclusion != 'failure' }}
@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Test
-        run: POSTGRES_PASSWORD=${{ secrets.db.POSTGRES_PASSWORD }} docker compose -f docker-compose.db.yml up
+        run: POSTGRES_PASSWORD=api docker compose -f docker-compose.db.yml up
   deploy:
     needs: [build, test]
     if: ${{ github.event.workflow_run.conclusion != 'failure' }}
