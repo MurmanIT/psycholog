@@ -39,14 +39,15 @@ jobs:
           username: ${{ vars.DEPLOY_USERNAME }}
           key: ${{ secrets.DEPLOY_KEY }}
           port: ${{ vars.DEPLOY_PORT }}
-          source: "./../../docker-compose.db.yml, ./.env"
+          source: "./docker-compose.db.yml, ./.env"
           target: "~/.deploy/${{ github.event.repository.name }}/"
-      # - name: Deploy
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ vars.DEPLOY_HOST }}
-      #     username: ${{ vars.DEPLOY_USERNAME }}
-      #     key: ${{ secrets.DEPLOY_KEY }}
-      #     port: ${{ vars.DEPLOY_PORT }}
-      #     script: |
-      #       docker compose -f docker-compose.db.yml up -d
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ vars.DEPLOY_PORT }}
+          script: |
+            cd ~/.deploy/${{ github.event.repository.name }}
+            docker compose -f docker-compose.db.yml up -d
