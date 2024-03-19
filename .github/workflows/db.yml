@@ -31,7 +31,7 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           port: ${{ vars.DEPLOY_PORT }}
           source: .env
-          target: .env
+          target: deploy/.env
 
       - name: Copy files to target server via scp
         uses: appleboy/scp-action@master
@@ -41,7 +41,7 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           port: ${{ vars.DEPLOY_PORT }}
           source: docker-compose.db.yml
-          target: docker-compose.db.yml
+          target: deploy/docker-compose.db.yml
 
       - name: Deploy
         uses: appleboy/ssh-action@master
